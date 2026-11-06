@@ -1,0 +1,52 @@
+services:
+  backend:
+    image: minilex-backend:local
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 15s
+    networks:
+      - minilex
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/api/health', timeout=3).read()"
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  frontend:
+    image: minilex-frontend:local
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
+    ports:
+      - "3000:80"
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 10s
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - minilex
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+networks:
+  minilex:
+    name: minilex-network
+    driver: bridge

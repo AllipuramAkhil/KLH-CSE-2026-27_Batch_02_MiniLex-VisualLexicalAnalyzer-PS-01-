@@ -1,0 +1,16 @@
+.git/
+.venv/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+**/*.tsbuildinfo
+**/npm-debug.log*
+.env
+.env.*
+!.env.example
+*.tmp
+*.log
